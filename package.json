@@ -1,0 +1,17 @@
+{
+  "name": "routine-quest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Routine Quest Android app",
+  "scripts": {
+    "build": "node scripts/prepare-icons.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "sharp": "^0.34.3"
+  }
+}
