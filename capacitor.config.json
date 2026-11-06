@@ -1,0 +1,11 @@
+{
+  "appId": "com.routinequest.app",
+  "appName": "루틴 퀘스트",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
