@@ -1,0 +1,52 @@
+name: Build Routine Quest Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'www/**'
+      - 'assets/**'
+      - 'package.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/android-apk.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install dependencies
+        run: npm install
+      - name: Prepare icon artwork
+        run: npm run build
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Generate Android launcher icons
+        run: |
+          mkdir -p android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
+          npx sharp-cli -i assets/icon.png -o /tmp/icon.png resize 192
+          for spec in 'mdpi:48' 'hdpi:72' 'xhdpi:96' 'xxhdpi:144' 'xxxhdpi:192'; do
+            density=${spec%%:*}; size=${spec##*:}
+            npx sharp-cli -i assets/icon.png -o android/app/src/main/res/mipmap-${density}/ic_launcher.png resize ${size} ${size}
+            cp android/app/src/main/res/mipmap-${density}/ic_launcher.png android/app/src/main/res/mipmap-${density}/ic_launcher_round.png
+          done
+      - name: Sync Capacitor
+        run: npx cap sync android
+      - name: Build debug APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: routine-quest-android-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
