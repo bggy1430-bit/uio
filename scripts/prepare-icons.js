@@ -1,0 +1,1 @@
+const fs=require('fs');const sharp=require('sharp');(async()=>{fs.mkdirSync('assets',{recursive:true});await sharp('assets/icon.svg').resize(1024,1024).png().toFile('assets/icon.png');})();
